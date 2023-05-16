@@ -1,0 +1,36 @@
+@import url("./default.less");
+
+/**
+ * 修改主题
+ * @param color - 字体颜色
+ * @param bgColor - 背景颜色
+ */
+.changeTheme(@color: @primaryColor, @bgColor: @primaryBg, @svgColor: @svgColor) {
+  color: @color !important;
+  background: @bgColor !important;
+
+  .bg {
+    background-color: @bgColor !important;
+  }
+
+  .change svg {
+    color: @svgColor !important;
+  }
+
+  a,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: @color !important;
+  }
+
+  #container,
+  #header,
+  #layout {
+    color: @color !important;
+    background: @bgColor !important;
+  }
+}
