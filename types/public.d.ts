@@ -40,7 +40,7 @@ export interface PageServerResult<T = unknown> {
   code: number;
   message?: string;
   data: {
-    items: T,
+    records: T,
     total: number
   }
 }
@@ -75,3 +75,9 @@ export type TableColumn<T = object> = ColumnsType<T>
 
 // 表格操作
 export type TableOptions<T = object> = (value: unknown, record: T, index?: number) => JSX.Element
+
+export interface Option {
+  label: string;
+  value: string;
+  disabled?: boolean;
+}

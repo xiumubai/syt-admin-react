@@ -2,7 +2,7 @@ import type { LoginData } from './model'
 import type { FormProps } from 'antd'
 import type { AppDispatch } from '@/stores'
 import type { ThemeType } from '@/stores/public'
-import { message } from 'antd'
+// import { message } from 'antd'
 import { Form, Button, Input } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -14,9 +14,9 @@ import { useTitle } from '@/hooks/useTitle'
 import { useToken } from '@/hooks/useToken'
 import { setThemeValue } from '@/stores/public'
 import { permissionsToArray } from '@/utils/permissions'
-import { setPermissions, setUserInfo } from '@/stores/user'
+import { setPermissions, setButtons, setUserInfo } from '@/stores/user'
 import { useCommonStore } from '@/hooks/useCommonStore'
-import { getPermissions } from '@/servers/permissions'
+import { getUserInfo } from '@/servers/permissions'
 import { getFirstMenu } from '@/menus/utils/helper'
 import { defaultMenus } from '@/menus'
 import Logo from '@/assets/images/logo.svg'
@@ -57,19 +57,21 @@ function Login() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  /** 获取用户权限 */
+  /** 获取用户信息和权限信息 */
   const getUserPermissions = async () => {
     try {
       setLoading(true)
-       const { data } = await getPermissions({ refresh_cache: false })
-       if (data) {
-          const { data: { user, permissions } } = data
-          const newPermissions = permissionsToArray(permissions)
-          const firstMenu = getFirstMenu(defaultMenus, newPermissions)
-          dispatch(setUserInfo(user))
-          dispatch(setPermissions(newPermissions))
-          navigate(firstMenu)
-       }
+      const { data } = await getUserInfo()
+      if (data) {
+        const { data : {name, avatar, routes, buttons } } = data
+        const newPermissions = permissionsToArray(routes || [])
+        
+        const firstMenu = getFirstMenu(defaultMenus, newPermissions)
+        dispatch(setUserInfo({name, avatar}))
+        dispatch(setPermissions(newPermissions))
+        dispatch(setButtons(buttons))
+        navigate(firstMenu)
+      }
     } finally {
       setLoading(false)
     }
@@ -77,24 +79,14 @@ function Login() {
 
   /**
    * 处理登录
-   * @param values - 表单数据
+   * @param values - 表单数据提交
    */
   const handleFinish: FormProps['onFinish'] = async (values: LoginData) => {
     try {
       setLoading(true)
-      const result = await login(values)
-      console.log(result)
-      setToken(result.data)
-      // if (!permissions?.length || !token) {
-      //   return message.error({ content: '用户暂无权限登录', key: 'permissions' })
-      // }
-
-      // const newPermissions = permissionsToArray(permissions)
-      // const firstMenu = getFirstMenu(defaultMenus, newPermissions)
-      // 
-      // dispatch(setUserInfo(user))
-      // dispatch(setPermissions(newPermissions))
-      // navigate(firstMenu)
+      const { data } = await login(values)
+      setToken(data?.data)
+      getUserPermissions()
     } finally {
       setLoading(false)
     }

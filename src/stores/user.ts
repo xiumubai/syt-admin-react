@@ -3,14 +3,14 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    // 用户权限
+    // 用户菜单权限
     permissions: [],
+    // 用户按钮权限
+    buttons: [],
     // 用户信息
     userInfo: {
-      id: 0,
-      username: '',
-      email: '',
-      phone: ''
+      avatar: '',
+      name: '',
     }
   },
   reducers: {
@@ -22,13 +22,14 @@ export const userSlice = createSlice({
     setPermissions: (state, action) => {
       state.permissions = action.payload
     },
+    setButtons: (state, action) => {
+      state.buttons = action.payload
+    },
     /** 清除用户信息 */
     clearInfo: (state) => {
       state.userInfo = {
-        id: 0,
-        username: '',
-        email: '',
-        phone: ''
+        avatar: '',
+        name: ''
       }
     }
   }
@@ -37,6 +38,7 @@ export const userSlice = createSlice({
 export const {
   setUserInfo,
   setPermissions,
+  setButtons,
   clearInfo
 } = userSlice.actions
 

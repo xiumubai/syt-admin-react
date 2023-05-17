@@ -34,6 +34,7 @@ request.interceptors.request.use(
   (config) => {
     const [getToken] = useToken()
     const token = getToken() || ''
+    
     if (config?.headers && token) {
       config.headers.token = token
     }
@@ -81,7 +82,7 @@ request.interceptors.response.use(
       return Promise.reject(response)
     }
 
-    return Promise.resolve(res)
+    return Promise.resolve(response)
   },
   (error) => {
     //置空请求列表

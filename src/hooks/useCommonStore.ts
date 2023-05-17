@@ -6,12 +6,14 @@ import { useSelector } from 'react-redux'
  * 获取常用的状态数据
  */
 export const useCommonStore = () => {
-  // 权限
+  // 菜单权限
   const permissions = useSelector((state: RootState) => state.user.permissions)
-  // 用户ID
-  const userId = useSelector((state: RootState) => state.user.userInfo.id)
+  // 按钮权限
+  const buttons = useSelector((state: RootState) => state.user.buttons)
   // 用户名
-  const username = useSelector((state: RootState) => state.user.userInfo.username)
+  const name = useSelector((state: RootState) => state.user.userInfo.name)
+  // 用户头像
+  const avatar = useSelector((state: RootState) => state.user.userInfo.avatar)
   // 是否窗口最大化
   const isMaximize = useSelector((state: RootState) => state.tabs.isMaximize)
   // 导航数据
@@ -41,8 +43,9 @@ export const useCommonStore = () => {
     isFullscreen,
     nav,
     permissions,
-    userId,
-    username,
+    buttons,
+    avatar,
+    name,
     openKeys,
     selectedKeys,
     tabs,

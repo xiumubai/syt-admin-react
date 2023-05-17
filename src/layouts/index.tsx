@@ -3,9 +3,9 @@ import { useToken } from '@/hooks/useToken'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useOutlet } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { getPermissions } from '@/servers/permissions'
+import { getUserInfo } from '@/servers/permissions'
 import { permissionsToArray } from '@/utils/permissions'
-import { setPermissions, setUserInfo } from '@/stores/user'
+import { setPermissions, setButtons, setUserInfo } from '@/stores/user'
 import { toggleCollapsed, togglePhone } from '@/stores/menu'
 import { useCommonStore } from '@/hooks/useCommonStore'
 import { useLocation } from 'react-router-dom'
@@ -31,24 +31,25 @@ function Layout() {
 
   const {
     permissions,
-    userId,
     isMaximize,
     isCollapsed,
     isPhone,
     isRefresh
   } = useCommonStore()
 
-  /** 获取用户信息和权限 */
-  const getUserInfo = useCallback(async () => {
+  /** 获取用户信息和权限，每次刷新都会加载，从新获取用户信息和权限 */
+  const getUserPermissions = useCallback(async () => {
     try {
       setLoading(true)
-      const { data } = await getPermissions({ refresh_cache: false })
+      const { data } = await getUserInfo()
       if (data) {
-        const { data: { user, permissions } } = data
-        const newPermissions = permissionsToArray(permissions)
-        dispatch(setUserInfo(user))
+        const { data: { name, avatar, routes, buttons} } = data
+        const newPermissions = permissionsToArray(routes || [])
+        dispatch(setUserInfo({name, avatar}))
         dispatch(setPermissions(newPermissions))
+        dispatch(setButtons(buttons))
       }
+      
     } catch(err) {
       console.error('获取用户数据失败:', err)
       setPermissions([])
@@ -63,12 +64,9 @@ function Layout() {
     if (!token) {
       navigate('/login')
     }
-
     // 当用户信息缓存不存在时则重新获取
-    if (token && !userId) {
-      getUserInfo()
-    }
-  }, [getUserInfo, navigate, token, userId])
+    getUserPermissions()
+  }, [getUserPermissions, navigate, token])
 
   /** 判断是否是手机端 */
   const handleIsPhone = useDebounceFn(() => {

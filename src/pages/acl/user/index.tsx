@@ -1,8 +1,8 @@
 import type { FormData } from '#/form'
-import type { DataNode } from 'antd/es/tree'
-import type { Key } from 'antd/es/table/interface'
+import type { Option } from '#/public'
 import type { PagePermission, TableOptions } from '#/public'
 import type { FormFn } from '@/components/Form/BasicForm'
+import type { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createList, searchList, tableColumns } from './model'
 import { Button, message } from 'antd'
@@ -11,13 +11,13 @@ import { checkPermission } from '@/utils/permissions'
 import { useCommonStore } from '@/hooks/useCommonStore'
 import { ADD_TITLE, EDIT_TITLE } from '@/utils/config'
 import { UpdateBtn, DeleteBtn } from '@/components/Buttons'
-import { getPermission, savePermission } from '@/servers/system/menu'
 import {
   createUser,
   deleteUser,
-  getUserById,
-  getUserPage,
-  updateUser
+  getUserList,
+  updateUser,
+  getAssignList,
+  doAssign,
 } from '@/servers/system/user'
 import BasicContent from '@/components/Content/BasicContent'
 import BasicSearch from '@/components/Search/BasicSearch'
@@ -30,6 +30,8 @@ import PermissionDrawer from './components/PermissionDrawer'
 // 当前行数据
 interface RowData {
   id: string;
+  username: string;
+  password: string
 }
 
 // 初始化搜索
@@ -43,7 +45,7 @@ const initCreate = {
   status: 1
 }
 
-function Page() {
+function User() {
   useTitle('用户管理')
   const searchFormRef = useRef<FormFn>(null)
   const createFormRef = useRef<FormFn>(null)
@@ -60,21 +62,18 @@ function Page() {
 
   const [promiseId, setPromiseId] = useState('')
   const [isPromiseVisible, setPromiseVisible] = useState(false)
-  const [promiseCheckedKeys, setPromiseCheckedKeys] = useState<Key[]>([])
-  const [promiseTreeData, setPromiseTreeData] = useState<DataNode[]>([])
+  const [promiseCheckedKeys, setPromiseCheckedKeys] = useState<CheckboxValueType[]>([])
+  const [promiseTreeData, setPromiseTreeData] = useState<Option[]>([])
 
-  const { permissions } = useCommonStore()
-
-  // 权限前缀
-  const permissionPrefix = '/authority/user'
+  // 按钮权限列表
+  const { buttons } = useCommonStore()
   
-  // 权限
+  // 按钮权限控制
   const pagePermission: PagePermission = {
-    page: checkPermission(`${permissionPrefix}/index`, permissions),
-    create: checkPermission(`${permissionPrefix}/create`, permissions),
-    update: checkPermission(`${permissionPrefix}/update`, permissions),
-    delete: checkPermission(`${permissionPrefix}/delete`, permissions),
-    permission: checkPermission(`${permissionPrefix}/authority`, permissions)
+    add: checkPermission(`btn.User.add`, buttons),
+    update: checkPermission(`btn.User.update`, buttons),
+    remove: checkPermission(`btn.User.remove`, buttons),
+    assgin: checkPermission(`btn.User.assgin`, buttons)
   }
 
   /**
@@ -93,10 +92,10 @@ function Page() {
   const handleSearch = useCallback(async (values: FormData) => {
     try {
       setLoading(true)
-      const { data: { data } } = await getUserPage(values)
-      const { items, total } = data
+      const { data: { data } } = await getUserList(values)
+      const { records, total } = data
       setTotal(total)
-      setTableData(items)
+      setTableData(records)
     } finally {
       setLoading(false)
     }
@@ -104,19 +103,27 @@ function Page() {
 
   // 首次进入自动加载接口数据
   useEffect(() => {
-    if (pagePermission.page) handleSearch({ ...initSearch })
-  }, [handleSearch, pagePermission.page])
+    handleSearch({ ...initSearch })
+  }, [handleSearch])
 
   /** 开启权限 */
   const openPermission = async (id: string) => {
     try {
       setLoading(true)
-      const params = { userId: id }
-      const { data } = await getPermission(params)
-      const { data: { defaultCheckedKeys, treeData } } = data
+      const { data } = await getAssignList(id)
+      const { data: { assignRoles, allRolesList } } = data
+
+      const r = allRolesList.map((item: FormData) => {
+        return {
+          label: item.roleName,
+          value: item.id,
+        }
+      })
+      const l: number[] = assignRoles.map((i: FormData) => i?.id)
+      
       setPromiseId(id)
-      setPromiseTreeData(treeData)
-      setPromiseCheckedKeys(Object.values(defaultCheckedKeys))
+      setPromiseTreeData(r)
+      setPromiseCheckedKeys(Object.values(l))
       setPromiseVisible(true)
     } finally {
       setLoading(false)
@@ -126,21 +133,23 @@ function Page() {
   /** 关闭权限 */
   const closePermission = () => {
     setPromiseVisible(false)
+    setPromiseTreeData([])
+    setPromiseCheckedKeys(Object.values([]))
   }
   
   /**
    * 权限提交
    */
-  const permissionSubmit = async (checked: Key[]) => {
+  const permissionSubmit = async (checkedList: CheckboxValueType[]) => {
     try {
       setLoading(true)
-      const params = {
-        menuIds: checked,
-        userId: promiseId
-      }
-      const { data } = await savePermission(params)
+      const { data } = await doAssign(promiseId, checkedList)
       message.success(data.message || '授权成功')
       setPromiseVisible(false)
+      // 重置数据
+      setPromiseTreeData([])
+      setPromiseCheckedKeys(Object.values([]))
+      getPage()
     } finally {
       setLoading(false)
     }
@@ -158,14 +167,13 @@ function Page() {
    * 点击编辑
    * @param id - 唯一值
    */
-  const onUpdate = async (id: string) => {
+  const onUpdate = async (row: RowData) => {
     try {
       setCreateOpen(true)
-      setCreateTitle(EDIT_TITLE(id))
-      setCreateId(id)
+      setCreateTitle(EDIT_TITLE(row?.username))
+      setCreateId(row?.id)
       setCreateLoading(true)
-      const { data: { data } } = await getUserById(id as string)
-      setCreateData(data)
+      setCreateData(row as unknown as FormData)
     } finally {
       setCreateLoading(false)
     }
@@ -195,7 +203,7 @@ function Page() {
   const handleCreate = async (values: FormData) => {
     try {
       setCreateLoading(true)
-      const functions = () => createId ? updateUser(createId, values) : createUser(values)
+      const functions = () => createId ? updateUser({...values, id: createId}) : createUser(values)
       const { data } = await functions()
       message.success(data?.message || '操作成功')
       setCreateOpen(false)
@@ -242,13 +250,13 @@ function Page() {
   const optionRender: TableOptions<object> = (_, record) => (
     <>
       {
-        pagePermission.permission === true &&
+        pagePermission.assgin === true &&
         <Button
           className='mr-2'
           loading={isLoading}
           onClick={() => openPermission((record as RowData).id)}
         >
-          权限
+          角色
         </Button>
       }
       {
@@ -256,11 +264,11 @@ function Page() {
         <UpdateBtn
           className='mr-5px'
           isLoading={isLoading}
-          onClick={() => onUpdate((record as RowData).id)}
+          onClick={() => onUpdate(record as RowData)}
         />
       }
       {
-        pagePermission.delete === true &&
+        pagePermission.remove === true &&
         <DeleteBtn
           className='mr-5px'
           isLoading={isLoading}
@@ -271,14 +279,14 @@ function Page() {
   )
 
   return (
-    <BasicContent isPermission={pagePermission.page}>
+    <BasicContent>
       <>
         <BasicSearch
           formRef={searchFormRef}
           list={searchList}
           data={initSearch}
+          isCreate={pagePermission.add}
           isLoading={isLoading}
-          isCreate={pagePermission.create}
           onCreate={onCreate}
           handleFinish={onSearch}
         />
@@ -306,7 +314,7 @@ function Page() {
         >
           <BasicForm
             formRef={createFormRef}
-            list={createList}
+            list={createList(createId)}
             data={createData}
             labelCol={{ span: 6 }}
             handleFinish={handleCreate}
@@ -325,4 +333,4 @@ function Page() {
   )
 }
 
-export default Page
+export default User

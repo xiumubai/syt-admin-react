@@ -17,11 +17,9 @@ import {
   FormOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons'
-import Avatar from '@/assets/images/avatar.png'
 import styles from '../index.module.less'
 import Fullscreen from '@/components/Fullscreen'
 import GlobalSearch from '@/components/GlobalSearch'
-import DataScreen from '@/components/DataScreen'
 import Theme from '@/components/Theme'
 import UpdatePassword from './UpdatePassword'
 import Nav from './Nav'
@@ -36,7 +34,8 @@ function Header() {
   const {
     isCollapsed,
     isMaximize,
-    username,
+    name,
+    avatar,
     nav
   } = useCommonStore()
   // 是否窗口最大化
@@ -93,7 +92,6 @@ function Header() {
   const RightRender = () => {
     return (
       <div className="flex items-center">
-        <DataScreen />
         <GlobalSearch />
         <Fullscreen />
         <Theme />
@@ -106,14 +104,14 @@ function Header() {
             onClick={e => e.preventDefault()}
           >
             <img
-              src={Avatar}
+              src={avatar}
               width={27}
               height={27}
               alt="头像"
               className="rounded-1/2 overflow-hidden object-cover bg-light-500"
             />
             <span className="ml-2 text-15px min-w-50px truncate">
-              { username || 'south-admin' }
+              { name || 'south-admin' }
             </span>
           </div>
         </Dropdown>

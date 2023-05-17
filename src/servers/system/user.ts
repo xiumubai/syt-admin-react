@@ -1,28 +1,22 @@
 import type { FormData } from '#/form'
 import type { PageServerResult, PaginationData } from '#/public'
+import type { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { request } from '@/utils/request'
 
 enum API {
-  URL = '/authority/user'
+  URL = '/admin/acl/user'
 }
 
 /**
- * 获取分页数据
- * @param data - 请求数据
+ * @description: 获取后台用户分页列表(带搜索)
+ * @param {GetUserListParams} param
+ * @returns {*}
  */
-export function getUserPage(data: Partial<FormData> & PaginationData) {
+export const getUserList = (data: Partial<FormData> & PaginationData) => {
   return request.get<PageServerResult<FormData[]>>(
-    `${API.URL}/index`,
-    { params: data }
-  )
-}
-
-/**
- * 根据ID获取数据
- * @param id - ID
- */
-export function getUserById(id: string) {
-  return request.get(`${API.URL}/${id}`)
+    `${API.URL}/${data.page}/${data.pageSize}`, {
+    params: { username: data.username }
+  })
 }
 
 /**
@@ -30,7 +24,7 @@ export function getUserById(id: string) {
  * @param data - 请求数据
  */
 export function createUser(data: FormData) {
-  return request.post(API.URL, data)
+  return request.post(`${API.URL}/save`, data)
 }
 
 /**
@@ -38,8 +32,8 @@ export function createUser(data: FormData) {
  * @param id - 修改id值
  * @param data - 请求数据
  */
-export function updateUser(id: string, data: FormData) {
-  return request.put(`${API.URL}/${id}`, data)
+export function updateUser(data: FormData) {
+  return request.put(`${API.URL}/update`, data)
 }
 
 /**
@@ -47,5 +41,21 @@ export function updateUser(id: string, data: FormData) {
  * @param id - 删除id值
  */
 export function deleteUser(id: string) {
-  return request.delete(`${API.URL}/${id}`)
+  return request.delete(`${API.URL}/remove/${id}`)
+}
+
+/**
+ * 删除
+ * @param id - 根据用户获取角色数据
+ */
+export function getAssignList(adminId: string) {
+  return request.get(`${API.URL}/toAssign/${adminId}`)
+}
+
+/**
+ * 删除
+ * @param id - 根据用户获取角色数据
+ */
+export function doAssign(adminId: number | string, roleId: CheckboxValueType[]) {
+  return request.post(`${API.URL}/doAssign?adminId=${adminId}&roleId=${roleId}`)
 }

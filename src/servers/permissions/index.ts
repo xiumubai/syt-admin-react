@@ -3,12 +3,12 @@ import type { ServerResult } from '#/public'
 import { request } from '@/utils/request'
 
 /**
- * 权限
+ * 权限和用户信息
  * @param data - 请求数据
  */
-export function getPermissions(data: unknown) {
+export function getUserInfo() {
   return request.get<ServerResult<LoginResult>>(
-    '/authority/user/refresh-permissions',
-    { params: data }
+    '/admin/acl/index/info',
   )
 }
+

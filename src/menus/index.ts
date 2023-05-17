@@ -2,6 +2,7 @@ import type { SideMenu } from '#/public'
 import { system } from './system'
 import { demo } from './demo'
 import { content } from './content'
+import { acl } from './acl'
 
 export const defaultMenus: SideMenu[] = [
   {
@@ -19,4 +20,5 @@ export const defaultMenus: SideMenu[] = [
   ...demo as SideMenu[],
   ...system as SideMenu[],
   ...content as SideMenu[],
+  ...acl as SideMenu[],
 ]
