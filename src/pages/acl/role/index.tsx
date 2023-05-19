@@ -1,5 +1,4 @@
 import type { FormData } from '#/form'
-import type { Option } from '#/public'
 import type { PagePermission, TableOptions } from '#/public'
 import type { FormFn } from '@/components/Form/BasicForm'
 import type { CheckboxValueType } from 'antd/es/checkbox/Group'
@@ -64,8 +63,8 @@ function Role() {
 
   const [promiseId, setPromiseId] = useState('')
   const [isPromiseVisible, setPromiseVisible] = useState(false)
-  const [promiseCheckedKeys, setPromiseCheckedKeys] = useState<CheckboxValueType[]>([])
-  const [promiseTreeData, setPromiseTreeData] = useState<Option[]>([])
+  const [promiseCheckedKeys, setPromiseCheckedKeys] = useState([])
+  const [promiseTreeData, setPromiseTreeData] = useState([])
 
   // 按钮权限列表
   const { buttons } = useCommonStore()
@@ -116,7 +115,7 @@ function Role() {
       const menuIds = getCheckedIds(data.data, [])
       setPromiseId(id)
       setPromiseTreeData(data.data[0].children)
-      setPromiseCheckedKeys(menuIds)
+      setPromiseCheckedKeys(menuIds as never)
       setPromiseVisible(true)
     } finally {
       setLoading(false)
@@ -124,8 +123,8 @@ function Role() {
   }
 
   // 所有选中的节点id
-  const getCheckedIds = (auths, initArr: any[]) =>{ 
-    auths.forEach((item) => {
+  const getCheckedIds = (auths: any, initArr: any[]) => { 
+    auths.forEach((item: any) => {
       if (item.select) {
         initArr.push(item?.id)
       }

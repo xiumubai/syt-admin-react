@@ -96,7 +96,7 @@ function Persmisson() {
    * 点击编辑
    * @param id - 唯一值
    */
-  const onUpdate = async (row: RowData) => {
+  const onUpdate = async (row: any) => {
     try {
       setPermision(() => {
         return {
@@ -108,7 +108,7 @@ function Persmisson() {
       setCreateTitle(EDIT_TITLE(row?.name))
       setCreateId(row?.id)
       setCreateLoading(true)
-      setCreateData(row as unknown as FormData)
+      setCreateData(row)
     } finally {
       setCreateLoading(false)
     }
@@ -170,7 +170,7 @@ function Persmisson() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender: TableOptions<object> = (_, record) => (
+  const optionRender: TableOptions<object> = (_, record: any) => (
     <>
       {
         pagePermission.add === true &&
@@ -231,7 +231,7 @@ function Persmisson() {
           <BasicForm
             formRef={createFormRef}
             list={createList(createId)}
-            data={createData}
+            data={createData || {}}
             labelCol={{ span: 6 }}
             handleFinish={handleCreate}
           />
