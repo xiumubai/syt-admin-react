@@ -11,9 +11,9 @@ export function login(data: LoginData) {
 }
 
 /**
- * 修改密码
+ * 登出
  * @param data - 请求数据
  */
-export function updatePassword(data: unknown) {
-  return request.post<ServerResult>('/update-password', data)
+export function logout() {
+  return request.post<ServerResult<string>>('/admin/acl/index/logout')
 }

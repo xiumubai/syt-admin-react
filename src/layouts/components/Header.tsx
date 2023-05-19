@@ -1,5 +1,4 @@
 import type { AppDispatch } from '@/stores'
-import type { PasswordModal } from './UpdatePassword'
 import { useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAliveController } from 'react-activation'
@@ -14,14 +13,13 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
-  FormOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons'
+import { logout } from '@/servers/login/index'
 import styles from '../index.module.less'
 import Fullscreen from '@/components/Fullscreen'
 import GlobalSearch from '@/components/GlobalSearch'
 import Theme from '@/components/Theme'
-import UpdatePassword from './UpdatePassword'
 import Nav from './Nav'
 
 type MenuKey = 'password' | 'logout'
@@ -38,16 +36,9 @@ function Header() {
     avatar,
     nav
   } = useCommonStore()
-  // 是否窗口最大化
-  const passwordRef = useRef<PasswordModal>(null)
 
   // 下拉菜单内容
   const items: MenuProps['items'] = [
-    {
-      key: 'password',
-      label: (<span>修改密码</span>),
-      icon: <FormOutlined className="mr-1" />,
-    },
     {
       key: 'logout',
       label: (<span>退出登录</span>),
@@ -58,10 +49,6 @@ function Header() {
   /** 点击菜单 */
   const onClick: MenuProps['onClick'] = e => {
     switch (e.key as MenuKey) {
-      case 'password':
-        passwordRef.current?.open()
-        break
-
       case 'logout':
         handleLogout()
         break
@@ -77,7 +64,8 @@ function Header() {
       title: '温馨提示',
       icon: <ExclamationCircleOutlined />,
       content: '是否确定退出系统?',
-      onOk() {
+      async onOk() {
+        await logout()
         dispatch(clearInfo())
         dispatch(closeAllTab())
         dispatch(setActiveKey(''))
@@ -159,8 +147,6 @@ function Header() {
         
         <RightRender />
       </header>
-
-      <UpdatePassword passwordRef={passwordRef} />
     </>
   )
 }

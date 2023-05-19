@@ -13,7 +13,7 @@ export const defaultMenus: SideMenu[] = [
       {
         label: '数据总览',
         key: '/dashboard',
-        rule: '/dashboard',
+        rule: 'Dashboard',
       }
     ]
   },
