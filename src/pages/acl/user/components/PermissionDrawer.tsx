@@ -7,7 +7,7 @@ import {
   Divider,
   Checkbox,
 } from 'antd'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface Props {
   isVisible: boolean;

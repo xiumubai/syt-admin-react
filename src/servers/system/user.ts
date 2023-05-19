@@ -54,7 +54,7 @@ export function getAssignList(adminId: string) {
 
 /**
  * 删除
- * @param id - 根据用户获取角色数据
+ * @param id - 根据用户分配角色
  */
 export function doAssign(adminId: number | string, roleId: CheckboxValueType[]) {
   return request.post(`${API.URL}/doAssign?adminId=${adminId}&roleId=${roleId}`)
