@@ -47,8 +47,8 @@ const initCreate = {
   status: 1
 }
 
-function User() {
-  useTitle('用户管理')
+function Role() {
+  useTitle('角色管理')
   const searchFormRef = useRef<FormFn>(null)
   const createFormRef = useRef<FormFn>(null)
   const [isLoading, setLoading] = useState(false)
@@ -72,10 +72,10 @@ function User() {
   
   // 按钮权限控制
   const pagePermission: PagePermission = {
-    add: checkPermission(`btn.User.add`, buttons),
-    update: checkPermission(`btn.User.update`, buttons),
-    remove: checkPermission(`btn.User.remove`, buttons),
-    assgin: checkPermission(`btn.User.assgin`, buttons)
+    add: checkPermission(`btn.Role.add`, buttons),
+    update: checkPermission(`btn.Role.update`, buttons),
+    remove: checkPermission(`btn.Role.remove`, buttons),
+    assgin: checkPermission(`btn.Role.assgin`, buttons)
   }
 
   /**
@@ -339,4 +339,4 @@ function User() {
   )
 }
 
-export default User
+export default Role
