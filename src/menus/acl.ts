@@ -2,7 +2,7 @@ import type { SideMenu } from '#/public'
 
 export const acl: SideMenu[] = [
   {
-    label: '权限管理',
+    label: '系统管理',
     key: 'acl',
     icon: 'majesticons:article-search-line',
     children: [

@@ -1,6 +1,6 @@
 import type { FormData } from '#/form'
 import { useCallback, useEffect, useState } from 'react'
-import { getDataTrends } from '@/servers/dashboard'
+// import { getDataTrends } from '@/servers/dashboard'
 import { searchList } from './model'
 import { useTitle } from '@/hooks/useTitle'
 import BasicSearch from '@/components/Search/BasicSearch'
@@ -26,10 +26,10 @@ function Dashboard() {
     // 数据转换
     values.all_pay = values.all_pay ? 1 : undefined
 
-    const query = { ...values }
+    // const query = { ...values }
     try {
       setLoading(true)
-      await getDataTrends(query)
+      // await getDataTrends(query)
     } finally {
       setLoading(false)
     }

@@ -3,6 +3,7 @@ import { system } from './system'
 import { demo } from './demo'
 import { content } from './content'
 import { acl } from './acl'
+import { cmn } from './cmn'
 
 export const defaultMenus: SideMenu[] = [
   {
@@ -13,7 +14,7 @@ export const defaultMenus: SideMenu[] = [
       {
         label: '数据总览',
         key: '/dashboard',
-        rule: 'Dashboard',
+        rule: '/Dashboard',
       }
     ]
   },
@@ -21,4 +22,5 @@ export const defaultMenus: SideMenu[] = [
   ...system as SideMenu[],
   ...content as SideMenu[],
   ...acl as SideMenu[],
+  ...cmn as SideMenu[]
 ]
