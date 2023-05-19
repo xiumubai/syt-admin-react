@@ -1,7 +1,7 @@
 import type { DataNode, TreeProps } from 'antd/es/tree'
 import type { Key } from 'antd/lib/table/interface'
 import { Drawer, Tree, Button } from 'antd'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Props {
   isVisible: boolean;
@@ -26,7 +26,11 @@ function PermissionDrawer(props: Props) {
     onClose,
     onSubmit
   } = props
-  const [treeCheckedKeys, setTreeCheckedKeys] = useState(checkedKeys)
+  const [treeCheckedKeys, setTreeCheckedKeys] = useState<Key[]>([])
+
+  useEffect(() => {
+    setTreeCheckedKeys(checkedKeys)
+  }, [checkedKeys])
 
   /** 提交 */
   const handleSubmit = () => {

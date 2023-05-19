@@ -7,7 +7,7 @@ import {
   Divider,
   Checkbox,
 } from 'antd'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Props {
   isVisible: boolean;
@@ -29,10 +29,14 @@ function PermissionDrawer(props: Props) {
   } = props
   
   const ids = treeData.map((item: Option) => item?.value)
-  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>(() => checkedKeys)
+  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>([])
     
   const [indeterminate, setIndeterminate] = useState(true)
   const [checkAll, setCheckAll] = useState<boolean>(false)
+
+  useEffect(() => {
+    setCheckedList(checkedKeys)
+  }, [checkedKeys])
 
   /** 提交 */
   const handleSubmit = () => {
