@@ -4,6 +4,9 @@ import { demo } from './demo'
 import { content } from './content'
 import { acl } from './acl'
 import { cmn } from './cmn'
+import { hospital } from './hospital'
+import { member } from './member'
+import { order } from './order'
 
 export const defaultMenus: SideMenu[] = [
   {
@@ -22,5 +25,8 @@ export const defaultMenus: SideMenu[] = [
   ...system as SideMenu[],
   ...content as SideMenu[],
   ...acl as SideMenu[],
-  ...cmn as SideMenu[]
+  ...cmn as SideMenu[],
+  ...hospital as SideMenu[],
+  ...member as SideMenu[],
+  ...order as SideMenu[],
 ]
