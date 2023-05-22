@@ -10,7 +10,6 @@ function Dict() {
   useTitle('数据字典')
   const [isLoading, setLoading] = useState(false)
   const [tableData, setTableData] = useState<FormData[]>([])
-
   /**
    * 搜索提交
    * @param values - 表单返回数据
@@ -19,6 +18,11 @@ function Dict() {
     try {
       setLoading(true)
       const { data: { data } } = await getDictList(1)
+      data.forEach(item => {
+        if (item.hasChildren) {
+          item.children = []
+        }
+      })
       setTableData(data)
     } finally {
       setLoading(false)
@@ -30,6 +34,30 @@ function Dict() {
     handleSearch()
   }, [handleSearch])
 
+  // 处理展开事件
+  const handleExpand = async (expanded: boolean, record: FormData) => {
+    if(!expanded) return //如果是关闭就返回
+    if(record.children && record.children.length > 0) return //如果已经有数据就返回
+    try {
+      setLoading(true)
+      const { data: { data } } = await getDictList(record.id)
+      data.forEach(item => {
+        if (item.hasChildren) {
+          item.children = []
+        }
+      })
+      const list = tableData
+      list.forEach((item) => {
+        if (item.id === record.id) {
+          item.children = data
+        }
+      })
+      setTableData(list)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <BasicContent>
       <Table
@@ -38,36 +66,9 @@ function Dict() {
         bordered
         pagination={false}
         rowKey="id"
+        loading={isLoading}
         expandable={{
-          expandIcon: ({expanded, record, onExpand}) => {
-            console.log(record)
-            
-            // 如果当前节点标识没有孩子, 不需要返回图标显示  => 让标题同级对齐
-            if (!record.hasChildren) {
-              return <span style={{display: 'inline-block', width: 24}}></span>
-            }
-            if (expanded) { // 当前是展开的状态
-              // 点击此图标不需要请求加载子列表
-              return <DownOutlined style={{marginRight: 10}} onClick={(e) => onExpand(record, e)} />
-            }
-            // 点击此图标很可能需要请求加载子列表
-            return <RightOutlined style={{marginRight: 10}} onClick={async (e) => {
-              // 标识有孩子, 但还没有, 请求获取子列表
-              if (record.hasChildren && record.children) {
-                const childList = await getDictList(record.id)
-                // 如果字典项的hasChildren为true, 给它添加一个children属性, 值为[]
-                childList.forEach(item => {
-                  if (item.hasChildren) {
-                    item.children = []
-                  }
-                })
-                // 添加为当前字典项的孩子
-                record.children = childList
-              }
-              // 切换图标
-              onExpand(record, e)
-            }} />
-          }
+          onExpand: handleExpand,
         }}
       />
     </BasicContent>
