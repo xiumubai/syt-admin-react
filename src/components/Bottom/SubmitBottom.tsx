@@ -1,14 +1,15 @@
 import { Button } from 'antd'
 
 interface Props {
-  goBack: () => void;
-  handleSubmit: () => void;
+  isSubmit?: boolean;
+  goBack?: () => void;
+  handleSubmit?: () => void;
   isLoading?: boolean;
   children?: JSX.Element;
 }
 
 function SubmitBottom(props: Props) {
-  const { goBack, handleSubmit, isLoading, children } = props
+  const { goBack, handleSubmit, isLoading, children, isSubmit = true } = props
 
   return (
     <div className={`
@@ -34,13 +35,16 @@ function SubmitBottom(props: Props) {
       >
         返回
       </Button>
-      <Button
-        loading={!!isLoading}
-        type="primary"
-        onClick={handleSubmit}
-      >
-        提交
-      </Button>
+      {
+        isSubmit !== false &&
+          <Button
+          loading={!!isLoading}
+          type="primary"
+          onClick={handleSubmit}
+        >
+          提交
+        </Button>
+      }
     </div>
   )
 }

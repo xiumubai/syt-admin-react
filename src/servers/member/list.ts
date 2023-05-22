@@ -26,3 +26,11 @@ export const getMemberList = (data: Partial<FormData> & PaginationData) => {
 export function lockMember(id: string, status: Status) {
   return request.get(`${API.URL}/lock/${id}/${status}`)
 }
+
+/**
+ * 用户信息
+ * @param data - 请求数据
+ */
+export function getMemberInfo(id: string) {
+  return request.get(`${API.URL}/show/${id}`)
+}
