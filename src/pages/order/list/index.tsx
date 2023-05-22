@@ -27,8 +27,8 @@ const initSearch = {
   pageSize: 20
 }
 
-function Order() {
-  useTitle('订单列表')
+function MemberList() {
+  useTitle('会员列表')
   const searchFormRef = useRef<FormFn>(null)
   const [isLoading, setLoading] = useState(false)
   const [page, setPage] = useState(initSearch.page)
@@ -147,4 +147,4 @@ function Order() {
   )
 }
 
-export default Order
+export default MemberList
