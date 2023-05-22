@@ -41,7 +41,7 @@ const initCreate = {
 }
 
 function Set() {
-  useTitle('用户管理')
+  useTitle('医院设置')
   const searchFormRef = useRef<FormFn>(null)
   const createFormRef = useRef<FormFn>(null)
   const [isLoading, setLoading] = useState(false)

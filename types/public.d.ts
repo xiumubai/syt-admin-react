@@ -1,6 +1,7 @@
 import type { SubMenuType } from 'antd/lib/menu/hooks/useItems'
 import type { ColumnsType } from 'antd/lib/table'
 import type { Dayjs } from 'dayjs'
+import { content } from '../src/menus/content';
 
 // 区间值
 type EventValue<T> = T | null
@@ -32,7 +33,7 @@ export type AllTypeData = BasicData | ArrayData | EmptyData | ObjectData | Symbo
 export interface ServerResult<T = unknown> {
   code: number;
   message?: string;
-  data: T
+  data: T;
 }
 
 // 分页接口响应数据
@@ -40,8 +41,10 @@ export interface PageServerResult<T = unknown> {
   code: number;
   message?: string;
   data: {
-    records: T,
-    total: number
+    records: T;
+    content?: T;
+    total: number;
+    totalElements?: number;
   }
 }
 
@@ -50,6 +53,8 @@ export interface PaginationData {
   page?: number;
   pageSize?: number;
 }
+
+export type Status = 0 | 1; // 0代表未上线 1 代表已上线
 
 // 侧边菜单
 export interface SideMenu extends Omit<SubMenuType, 'children' | 'label' | 'icon'> {

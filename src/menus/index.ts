@@ -27,6 +27,6 @@ export const defaultMenus: SideMenu[] = [
   ...acl as SideMenu[],
   ...cmn as SideMenu[],
   ...hospital as SideMenu[],
-  ...member as SideMenu[],
   ...order as SideMenu[],
+  ...member as SideMenu[],
 ]
