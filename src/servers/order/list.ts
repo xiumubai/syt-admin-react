@@ -29,7 +29,7 @@ export function updateHosStatus(id: string, status: Status) {
 }
 
 /**
- * 用户信息
+ * 订单详情信息
  * @param data - 请求数据
  */
 export function getOrderInfo(id: string) {

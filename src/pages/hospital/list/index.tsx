@@ -2,7 +2,7 @@ import type { FormData } from '#/form'
 import type { PagePermission, TableOptions } from '#/public'
 import type { FormFn } from '@/components/Form/BasicForm'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import tableColumns, { searchList } from './model'
+import { useNavigate } from 'react-router-dom'
 import { message, Button } from 'antd'
 import { useTitle } from '@/hooks/useTitle'
 import { checkPermission } from '@/utils/permissions'
@@ -11,6 +11,7 @@ import {
   getHospitalList,
   updateHosStatus
 } from '@/servers/hospitial/list'
+import tableColumns, { searchList } from './model'
 import BasicContent from '@/components/Content/BasicContent'
 import BasicSearch from '@/components/Search/BasicSearch'
 import BasicTable from '@/components/Table/BasicTable'
@@ -30,6 +31,7 @@ const initSearch = {
 
 function List() {
   useTitle('医院列表')
+  const navigate = useNavigate()
   const searchFormRef = useRef<FormFn>(null)
   const [isLoading, setLoading] = useState(false)
   const [page, setPage] = useState(initSearch.page)
@@ -83,7 +85,7 @@ function List() {
    * @param id - 唯一值
    */
   const onView = async (id: string) => {
-    console.log(id)
+    navigate(`/hospital/list/show?id=${id}`)
   }
 
   /**
@@ -91,7 +93,7 @@ function List() {
    * @param {string} id
    */  
   const onSchedule = (id: string) => {
-    console.log(id)
+    navigate(`/hospital/list/show?id=${id}`)
   }
 
   /** 获取表格数据 */
@@ -126,7 +128,7 @@ function List() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender: TableOptions<object> = (_, record) => (
+  const optionRender: TableOptions<object> = (_, record: any) => (
     <>
       {
         pagePermission.update === true &&

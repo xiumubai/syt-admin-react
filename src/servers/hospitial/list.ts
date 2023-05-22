@@ -29,3 +29,11 @@ export const getHospitalList = (data: Partial<FormData> & PaginationData) => {
 export function updateHosStatus(id: string, status: Status) {
   return request.get(`${API.URL}/updateStatus/${id}/${status}`)
 }
+
+/**
+ * 医院详情信息
+ * @param id - 请求数据
+ */
+export function getHosInfo(id: string) {
+  return request.get(`${API.URL}/show/${id}`)
+}

@@ -47,17 +47,17 @@ function Show() {
   return (
     <BasicContent>
       <>
-        <Descriptions title="用户信息" bordered column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}>
-          <Descriptions.Item label="姓名">{ memberInfo?.userInfo?.name || '-' }</Descriptions.Item>
-          <Descriptions.Item label="手机号">{ memberInfo?.userInfo?.phone }</Descriptions.Item>
-          <Descriptions.Item label="状态">{ memberInfo?.userInfo?.authStatus === 1 ? '正常' : '锁定' }</Descriptions.Item>
-          <Descriptions.Item label="注册时间">{ memberInfo?.userInfo?.createTime }</Descriptions.Item>
+        <Descriptions title="用户信息" column={4} bordered>
+          <Descriptions.Item label="姓名" span={2}>{ memberInfo?.userInfo?.name || '-' }</Descriptions.Item>
+          <Descriptions.Item label="手机号" span={2}>{ memberInfo?.userInfo?.phone }</Descriptions.Item>
+          <Descriptions.Item label="状态" span={2}>{ memberInfo?.userInfo?.authStatus === 1 ? '正常' : '锁定' }</Descriptions.Item>
+          <Descriptions.Item label="注册时间" span={2}>{ memberInfo?.userInfo?.createTime }</Descriptions.Item>
         </Descriptions>
         <Descriptions title="认证信息" bordered style={{ margin: '20px 0'}}>
-          <Descriptions.Item label="姓名">{ memberInfo?.userInfo?.name || '-' }</Descriptions.Item>
-          <Descriptions.Item label="证件类型	">{ memberInfo?.userInfo?.param?.certificatesTypeString || '-' }</Descriptions.Item>
-          <Descriptions.Item label="证件号">{ memberInfo?.userInfo?.certificatesNo || '-'}</Descriptions.Item>
-          <Descriptions.Item label="证件图片">
+          <Descriptions.Item label="姓名" span={2}>{ memberInfo?.userInfo?.name || '-' }</Descriptions.Item>
+          <Descriptions.Item label="证件类型" span={2}>{ memberInfo?.userInfo?.param?.certificatesTypeString || '-' }</Descriptions.Item>
+          <Descriptions.Item label="证件号" span={2}>{ memberInfo?.userInfo?.certificatesNo || '-'}</Descriptions.Item>
+          <Descriptions.Item label="证件图片" span={2}>
             {
               memberInfo?.userInfo?.certificatesUrl &&
               <img
