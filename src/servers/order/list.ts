@@ -27,3 +27,11 @@ export const getOrderList = (data: Partial<FormData> & PaginationData) => {
 export function updateHosStatus(id: string, status: Status) {
   return request.get(`${API.URL}/updateStatus/${id}/${status}`)
 }
+
+/**
+ * 用户信息
+ * @param data - 请求数据
+ */
+export function getOrderInfo(id: string) {
+  return request.get(`${API.URL}/show/${id}`)
+}

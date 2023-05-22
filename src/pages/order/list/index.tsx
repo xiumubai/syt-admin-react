@@ -7,9 +7,8 @@ import { Button } from 'antd'
 import { useTitle } from '@/hooks/useTitle'
 import { checkPermission } from '@/utils/permissions'
 import { useCommonStore } from '@/hooks/useCommonStore'
-import {
-  getOrderList
-} from '@/servers/order/list'
+import { useNavigate } from 'react-router-dom'
+import { getOrderList } from '@/servers/order/list'
 import BasicContent from '@/components/Content/BasicContent'
 import BasicSearch from '@/components/Search/BasicSearch'
 import BasicTable from '@/components/Table/BasicTable'
@@ -29,6 +28,7 @@ const initSearch = {
 
 function MemberList() {
   useTitle('会员列表')
+  const navigate = useNavigate()
   const searchFormRef = useRef<FormFn>(null)
   const [isLoading, setLoading] = useState(false)
   const [page, setPage] = useState(initSearch.page)
@@ -82,7 +82,7 @@ function MemberList() {
    * @param id - 唯一值
    */
   const onView = async (id: string) => {
-    console.log(id)
+    navigate(`/order/list/show?id=${id}`)
   }
   /**
    * 处理分页

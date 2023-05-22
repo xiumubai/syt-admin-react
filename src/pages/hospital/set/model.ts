@@ -59,7 +59,7 @@ export const searchList: FormList[] = [
     {
       title: '操作',
       dataIndex: 'operate',
-      width: 200,
+      width: 100,
       fixed: 'right',
       render: (value: unknown, record: object) => optionRender(value, record)
     },

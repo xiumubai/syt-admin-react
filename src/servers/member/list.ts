@@ -15,6 +15,7 @@ export const getMemberList = (data: Partial<FormData> & PaginationData) => {
     `${API.URL}/${data.page}/${data.pageSize}`, {
     params: {
       keyword: data.keyword,
+      authStatus: data.authStatus
     }
   })
 }
@@ -33,4 +34,12 @@ export function lockMember(id: string, status: Status) {
  */
 export function getMemberInfo(id: string) {
   return request.get(`${API.URL}/show/${id}`)
+}
+
+/**
+ * 同意or不同意审批接口
+ * @param data - 请求数据
+ */
+export function approval(id: string, status: Status) {
+  return request.get(`${API.URL}/approval/${id}/${status}`)
 }

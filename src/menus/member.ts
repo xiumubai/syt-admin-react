@@ -12,7 +12,7 @@ export const member: SideMenu[] = [
         rule: '/Member/memberList',
       },
       {
-        label: '认证审批列表',
+        label: '审批列表',
         key: '/member/auth',
         rule: '/Member/certificationApprovalList',
       },

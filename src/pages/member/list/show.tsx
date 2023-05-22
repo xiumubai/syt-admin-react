@@ -1,26 +1,20 @@
-import type { AppDispatch } from '@/stores'
 import { detailColumns } from './model'
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { setRefreshPage } from '@/stores/public'
 import { useTitle } from '@/hooks/useTitle'
 import { Descriptions } from 'antd'
 import { getMemberInfo } from '@/servers/member/list'
 import { useLocation } from 'react-router-dom'
 import { getUrlParam } from '@/utils/helper'
-import { closeTabGoNext } from '@/stores/tabs'
 import BasicContent from '@/components/Content/BasicContent'
 import SubmitBottom from '@/components/Bottom/SubmitBottom'
 import BasicTable from '@/components/Table/BasicTable'
 function Show() {
   useTitle('会员详情')
   const [memberInfo, setMemberInfo] = useState<any>({})
-  const { search, pathname } = useLocation()
-  const uri = pathname + search
+  const { search } = useLocation()
+  
   const id = getUrlParam(search, 'id')
-  const dispatch: AppDispatch = useDispatch()
   // 父路径
-  const fatherPath = '/member/list'
   /**
    * 搜索提交
    * @param values - 表单返回数据
@@ -46,12 +40,8 @@ function Show() {
    * 返回父级页面
    * @param isRefresh - 返回页面是否重新加载接口
    */
-  const goBack = (isRefresh?: boolean) => {
-    if (isRefresh) dispatch(setRefreshPage(true))
-    dispatch(closeTabGoNext({
-      key: uri,
-      nextPath: fatherPath
-    }))
+  const goBack = () => {
+    window.history.back()
   }
 
   return (
