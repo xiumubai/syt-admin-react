@@ -20,9 +20,9 @@ export const getMemberList = (data: Partial<FormData> & PaginationData) => {
 }
 
 /**
- * 更新医院上下线状态
+ * 锁定用户
  * @param data - 请求数据
  */
-export function updateHosStatus(id: string, status: Status) {
-  return request.get(`${API.URL}/updateStatus/${id}/${status}`)
+export function lockMember(id: string, status: Status) {
+  return request.get(`${API.URL}/lock/${id}/${status}`)
 }

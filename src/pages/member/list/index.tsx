@@ -1,20 +1,20 @@
 import type { FormData } from '#/form'
-import type { PagePermission, TableOptions } from '#/public'
+import type { PagePermission, TableOptions, Status } from '#/public'
 import type { FormFn } from '@/components/Form/BasicForm'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import tableColumns, { searchList } from './model'
-import { Button } from 'antd'
+import { Button, Modal, message } from 'antd'
 import { useTitle } from '@/hooks/useTitle'
 import { checkPermission } from '@/utils/permissions'
 import { useCommonStore } from '@/hooks/useCommonStore'
-import {
-  getMemberList
-} from '@/servers/member/list'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { getMemberList, lockMember } from '@/servers/member/list'
+import tableColumns, { searchList } from './model'
 import BasicContent from '@/components/Content/BasicContent'
 import BasicSearch from '@/components/Search/BasicSearch'
 import BasicTable from '@/components/Table/BasicTable'
 import BasicPagination from '@/components/Pagination/BasicPagination'
 
+const { confirm } = Modal
 // 当前行数据
 interface RowData {
   id: string;
@@ -96,12 +96,47 @@ function Order() {
     handleSearch({ ...formData, page, pageSize })
   }
 
+   /**
+   * 点击删除
+   * @param id - 唯一值
+   */
+   const onLock = (record: RowData) => {
+    try {
+      setLoading(true)
+      confirm({
+        title: '提示',
+        icon: <ExclamationCircleOutlined />,
+        content: `确定要${record.status === 1 ? '锁定' : '解锁'}会员吗?`,
+        okText: '确认',
+        okType: 'danger',
+        cancelText: '取消',
+        async onOk() {
+          const { data } = await lockMember(record.id, record.status as Status)
+          if (data?.code === 200) {
+            message.success(data?.message || '成功')
+            getPage()
+          }
+        },
+      })
+      
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /** 获取表格数据 */
+  const getPage = () => {
+    const formData = searchFormRef.current?.getFieldsValue() || {}
+    const params = { ...formData, page, pageSize }
+    handleSearch(params)
+  }
+
   /**
    * 渲染操作
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender: TableOptions<object> = (_, record) => (
+  const optionRender: TableOptions<object> = (_, record: any) => (
     <>
       {
         pagePermission.update === true &&
@@ -112,7 +147,16 @@ function Order() {
         >
           查看
         </Button>
-
+      }
+      {
+        pagePermission.update === true &&
+        <Button
+          className='mr-5px'
+          type='primary'
+          onClick={() => onLock(record as RowData)}
+        >
+          { record.authStatus === 1 ? '锁定' : '解锁' }
+        </Button>
       }
     </>
   )
