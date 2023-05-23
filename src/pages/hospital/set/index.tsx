@@ -14,7 +14,7 @@ import {
   createHos,
   deleteHos,
   updateHos,
-} from '@/servers/hospitial/set'
+} from '@/servers/hospital/set'
 import BasicContent from '@/components/Content/BasicContent'
 import BasicSearch from '@/components/Search/BasicSearch'
 import BasicModal from '@/components/Modal/BasicModal'

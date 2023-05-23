@@ -10,7 +10,7 @@ import { useCommonStore } from '@/hooks/useCommonStore'
 import {
   getHospitalList,
   updateHosStatus
-} from '@/servers/hospitial/list'
+} from '@/servers/hospital/list'
 import tableColumns, { searchList } from './model'
 import BasicContent from '@/components/Content/BasicContent'
 import BasicSearch from '@/components/Search/BasicSearch'
@@ -21,6 +21,7 @@ import BasicPagination from '@/components/Pagination/BasicPagination'
 interface RowData {
   id: string;
   status: number;
+  hoscode: string;
 }
 
 // 初始化搜索
@@ -92,8 +93,8 @@ function List() {
    * @description: 点击排班
    * @param {string} id
    */  
-  const onSchedule = (id: string) => {
-    navigate(`/hospital/list/show?id=${id}`)
+  const onSchedule = (hoscode: string) => {
+    navigate(`/hospital/list/schedule?hoscode=${hoscode}`)
   }
 
   /** 获取表格数据 */
@@ -145,7 +146,7 @@ function List() {
         <Button
           className='mr-5px'
           type='primary'
-          onClick={() => onSchedule((record as RowData).id)}
+          onClick={() => onSchedule((record as RowData).hoscode)}
         >
           排班
         </Button>

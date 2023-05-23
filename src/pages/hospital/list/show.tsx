@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTitle } from '@/hooks/useTitle'
 import { Descriptions } from 'antd'
-import { getHosInfo } from '@/servers/hospitial/list'
+import { getHosInfo } from '@/servers/hospital/list'
 import { useLocation } from 'react-router-dom'
 import { getUrlParam } from '@/utils/helper'
 import BasicContent from '@/components/Content/BasicContent'

@@ -1,28 +1,109 @@
+import type { Key } from 'react'
+import type { ScheduleRuleList, ScheduleList } from '@/servers/hospital/interface'
 import { useCallback, useEffect, useState } from 'react'
 import { useTitle } from '@/hooks/useTitle'
-import { Descriptions } from 'antd'
-import { getOrderInfo } from '@/servers/order/list'
 import { useLocation } from 'react-router-dom'
 import { getUrlParam } from '@/utils/helper'
+import { columns } from './model'
+import {
+  getDepartmentList,
+  getBookingScheduleRule,
+  getScheduleDetail
+} from '@/servers/hospital/schedule'
+import { Row, Col, Table, Pagination, Tag, Tree, message} from 'antd'
 import BasicContent from '@/components/Content/BasicContent'
 import SubmitBottom from '@/components/Bottom/SubmitBottom'
-function Show() {
+
+// 初始化搜索
+const initSearch = {
+  page: 1,
+  pageSize: 5
+}
+
+function Schedule() {
   useTitle('订单详情')
-  const [orderInfo, setOrderInfo] = useState<any>({})
+  const [departmentList, setDepartmentList] = useState<any>([])
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>([])
+  const [depcode, setDepcode] = useState('')
+  const [hosname, setHosname] = useState('')
+  const [depname, setDepname] = useState('')
+  const [workDate, setWorkDate] = useState('')
+  const [page, setPage] = useState(initSearch.page)
+  const [pageSize, setPageSize] = useState(initSearch.pageSize)
+  const [total, setTotal] = useState(0)
+  const [scheduleRuleList, setScheduleRuleList] = useState<ScheduleRuleList>([])
+  const [scheduleList, setScheduleList] = useState<ScheduleList>([])
+
   const { search } = useLocation()
-  
-  const id = getUrlParam(search, 'id')
-  // 父路径
+  const hoscode = getUrlParam(search, 'hoscode')
+
   /**
    * 搜索提交
-   * @param values - 表单返回数据
    */
-  const handleSearch = useCallback(async () => {
+  const getScheduleRuleList = async (page: number, limit: number, depcode: string) => {
     try {
-      const { data: { data } } = await getOrderInfo(id)
-      console.log(data)
-      
-      setOrderInfo(data || {})
+      const { data: { data } } = await getBookingScheduleRule(page, limit, hoscode, depcode)
+      setScheduleRuleList(data.bookingScheduleList)
+      setTotal(data.total)
+      setPage(page)
+      setPageSize(limit)
+      setHosname(data.baseMap.hosname)
+      if (data.total === 0) {
+        message.error('当前科室没有排班数据!')
+        // 清除一些老的数据
+        setScheduleList([])
+        setWorkDate('')
+      } else {
+        // 在初始显示排班规则列表后, 显示第一个规则对应的排班列表
+        const workDate = data.bookingScheduleList[0].workDate
+        // 保存到状态中
+        setWorkDate(workDate)
+        getScheduleList(depcode, workDate)
+      }
+    } finally {
+      console.log('over')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }
+
+  /**
+   * @description: 定义请求获取排班列表的函数
+   * @param {string} depcode
+   * @param {string} workDate
+   * @returns {*}
+   */
+  const getScheduleList = async (depcode: string, workDate: string) => {
+    const { data: { data } } = await getScheduleDetail(hoscode, depcode, workDate)
+    setScheduleList(data)
+  }
+
+  /**
+   * @description: 获取科室信息
+   * @returns {*}
+   */  
+  const getDepartmentListHandle = useCallback(async() => {
+    try {
+      const { data:  { data } } = await getDepartmentList(hoscode)
+      // 一级科室节点是禁用状态, 给一级数据对象添加一个disabled为true的属性
+      setDepartmentList(data.map(item => ({...item, disabled: true})))
+      setExpandedKeys(data.map(item => item.depcode))
+
+      // 如果当前医院没有科室数据, 提示一下
+      if (data.length === 0) {
+        message.error('当前医院还没有添加科室')
+        return
+      }
+
+      // 将第一个科室的第一个子科室的depcode保存到状态中
+      if (data[0].children) {
+        const {depcode, depname} = data[0].children[0]
+        setDepcode(depcode)
+        setDepname(depname)
+
+        // 获取对应的排班规则列表
+        getScheduleRuleList(1, 5, depcode)
+      }
+
     } finally {
       console.log('over')
     }
@@ -31,8 +112,9 @@ function Show() {
 
   // 首次进入自动加载接口数据
   useEffect(() => {
-    handleSearch()
-  }, [handleSearch])
+    getDepartmentListHandle()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   /**
    * 返回父级页面
@@ -42,36 +124,82 @@ function Show() {
     window.history.back()
   }
 
+  const onSelect = (selectedKeys: Key[], event: any) => {
+    if (selectedKeys.length === 0) return
+
+    // 得到点击科室的depcode
+    const depcode = selectedKeys[0] as string // selectedKeys  ['200004057']
+    // 保存到state中 => 就会选中
+    setDepcode(depcode)
+    // 得到科室的名称
+    const depname = event.node.depname
+    // 更新到状态中
+    setDepname(depname)
+
+    // 重新获取排班规则列表显示
+    getScheduleRuleList(1, 5, depcode)
+  }
+
+  const treeHeight = document.documentElement.clientHeight - 64 - 44 - 48 - 36
+
   return (
     <BasicContent>
       <>
-        <Descriptions title="订单信息" bordered column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}>
-          <Descriptions.Item label="订单交易号">{ orderInfo?.orderInfo.outTradeNo || '-' }</Descriptions.Item>
-          <Descriptions.Item label="医院名称">{ orderInfo?.orderInfo?.hosname }</Descriptions.Item>
-          <Descriptions.Item label="科室名称">{ orderInfo?.orderInfo?.depname }</Descriptions.Item>
-          <Descriptions.Item label="注册时间">{ orderInfo?.orderInfo?.createTime }</Descriptions.Item>
-          <Descriptions.Item label="医生职称">{ orderInfo?.orderInfo?.title }</Descriptions.Item>
-          <Descriptions.Item label="安排日期">{ orderInfo?.orderInfo?.reserveDate } { orderInfo?.orderInfo.reserveTime === 0 ? '上午' : '下午' }</Descriptions.Item>
-          <Descriptions.Item label="预约号序">{ orderInfo?.orderInfo?.number }</Descriptions.Item>
-          <Descriptions.Item label="医事服务费">{ orderInfo?.orderInfo?.amount }</Descriptions.Item>
-          <Descriptions.Item label="建议取号时间">{ orderInfo?.orderInfo?.fetchTime }</Descriptions.Item>
-          <Descriptions.Item label="取号地点">{ orderInfo?.orderInfo?.fetchAddress }</Descriptions.Item>
-          <Descriptions.Item label="订单状态">{ orderInfo?.orderInfo?.param.orderStatusString }</Descriptions.Item>
-          <Descriptions.Item label="预约时间">{ orderInfo?.orderInfo?.createTime }</Descriptions.Item>
-        </Descriptions>
-        <Descriptions title="就诊人信息" bordered style={{ margin: '20px 0'}}>
-          <Descriptions.Item label="姓名">{ orderInfo?.patient?.name || '-' }</Descriptions.Item>
-          <Descriptions.Item label="证件类型	">{ orderInfo?.patient?.param?.certificatesTypeString || '-' }</Descriptions.Item>
-          <Descriptions.Item label="证件编号">{ orderInfo?.patient?.certificatesNo || '-'}</Descriptions.Item>
-          <Descriptions.Item label="性别">{ orderInfo.patient.sex === 1 ? '男' : '女'}</Descriptions.Item>
-          <Descriptions.Item label="出生年月">{ orderInfo?.patient?.birthdate || '-'}</Descriptions.Item>
-          <Descriptions.Item label="手机号">{ orderInfo?.patient?.phone || '-'}</Descriptions.Item>
-          <Descriptions.Item label="是否结婚">{ orderInfo.patient.isMarry === 1 ? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="联系人姓名">{ orderInfo?.patient?.contactsName || '-'}</Descriptions.Item>
-          <Descriptions.Item label="联系人证件类型">{ orderInfo?.patient?.param.contactsCertificatesTypeString || '-'}</Descriptions.Item>
-          <Descriptions.Item label="联系人证件号">{ orderInfo?.patient?.contactsCertificatesNo || '-'}</Descriptions.Item>
-          <Descriptions.Item label="联系人手机">{ orderInfo?.patient?.contactsPhone || '-'}</Descriptions.Item>
-        </Descriptions>
+        <div className='mb-16px mt-16px'>选择：{hosname} / {depname} / {workDate}</div>
+        <Row gutter={20}>
+          <Col span={5}>
+            <div style={{
+              height: treeHeight,
+              overflowY: 'scroll'
+            }}>
+              <Tree
+                treeData={departmentList as []} 
+                fieldNames={{key: 'depcode', title: 'depname'}}
+                expandedKeys={expandedKeys}
+                selectedKeys={[depcode]}
+                onSelect={onSelect}
+              />  
+            </div>
+          </Col>
+          <Col span={19}>
+            {
+              scheduleRuleList.map((item: any) => (
+                <Tag
+                  key={item.workDate}
+                  color={workDate === item.workDate ? 'green' : ''}
+                  onClick={() => {
+                    if (item.workDate !== workDate) { 
+                      // 点击的不是当前的
+                      setWorkDate(item.workDate)
+                      // 重新获取排班列表显示
+                      getScheduleList(depcode, item.workDate)
+                    }
+                  }}
+                >
+                  <div>{item.workDate} {item.dayOfWeek}</div>
+                  <div>{item.availableNumber} / {item.reservedNumber}</div>
+                </Tag>
+              ))
+            }
+
+            <Pagination
+              style={{margin: '20px 0'}}
+              current={page}
+              pageSize={pageSize}
+              total={total}
+              pageSizeOptions={[5, 10, 15]}
+              showSizeChanger
+              onChange={(page, pageSize) => getScheduleRuleList(page, pageSize, depcode)}
+            />
+
+            <Table
+              dataSource={scheduleList}
+              columns={columns}
+              pagination={false}
+              rowKey='id'
+            />
+          </Col>
+        </Row>
         <SubmitBottom
           isSubmit={false}
           goBack={() => goBack()}
@@ -81,4 +209,4 @@ function Show() {
   )
 }
 
-export default Show
+export default Schedule

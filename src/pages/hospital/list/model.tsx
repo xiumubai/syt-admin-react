@@ -78,8 +78,47 @@ const tableColumns = (optionRender: TableOptions<object>): TableColumn => {
   ]
 }
 
+export const columns: TableColumn = [
+  {
+    title: '序号',
+    render (_x, _y, index) {
+      return index + 1
+    },
+    width: 80,
+    align: 'center',
+  },
+  {
+    title: '医生',
+    dataIndex: 'docname'
+  },
+  {
+    title: '职称',
+    dataIndex: 'title'
+  },
+  {
+    title: '号源时间',
+    dataIndex: 'workDate'
+  },
+  {
+    title: '总预约数',
+    dataIndex: 'reservedNumber'
+  },
+  {
+    title: '剩余预约数',
+    dataIndex: 'availableNumber'
+  },
+  {
+    title: '挂号费(元)',
+    dataIndex: 'amount'
+  },
+  {
+    title: '擅长技能',
+    dataIndex: 'skill'
+  }
+]
+
 // 新增数据
-export const createList: (id: string) => FormList[] = id => [
+export const createList: (id: string) => FormList[] = () => [
   {
     label: '医院名称',
     name: 'hosname',
