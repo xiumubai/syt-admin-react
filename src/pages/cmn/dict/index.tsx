@@ -1,15 +1,15 @@
-import type { FormData } from '#/form'
+import type { DictList } from '@/servers/cmn/interface'
 import { useCallback, useEffect, useState } from 'react'
 import { tableColumns } from './model'
 import { useTitle } from '@/hooks/useTitle'
 import { getDictList } from '@/servers/cmn/dict'
-import { DownOutlined, RightOutlined } from "@ant-design/icons"
+import { PlusCircleTwoTone, MinusCircleTwoTone } from "@ant-design/icons"
 import Table from "antd/lib/table"
 import BasicContent from '@/components/Content/BasicContent'
 function Dict() {
   useTitle('数据字典')
   const [isLoading, setLoading] = useState(false)
-  const [tableData, setTableData] = useState<FormData[]>([])
+  const [tableData, setTableData] = useState<DictList>([])
   /**
    * 搜索提交
    * @param values - 表单返回数据
@@ -17,8 +17,9 @@ function Dict() {
   const handleSearch = useCallback(async () => {
     try {
       setLoading(true)
-      const { data: { data } } = await getDictList(1)
+      const { data: { data } } = await getDictList('1')
       data.forEach(item => {
+        // 一级如果有children，增加一个children属性
         if (item.hasChildren) {
           item.children = []
         }
@@ -34,30 +35,6 @@ function Dict() {
     handleSearch()
   }, [handleSearch])
 
-  // 处理展开事件
-  const handleExpand = async (expanded: boolean, record: FormData) => {
-    if(!expanded) return //如果是关闭就返回
-    if(record.children && record.children.length > 0) return //如果已经有数据就返回
-    try {
-      setLoading(true)
-      const { data: { data } } = await getDictList(record.id)
-      data.forEach(item => {
-        if (item.hasChildren) {
-          item.children = []
-        }
-      })
-      const list = tableData
-      list.forEach((item) => {
-        if (item.id === record.id) {
-          item.children = data
-        }
-      })
-      setTableData(list)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
     <BasicContent>
       <Table
@@ -68,7 +45,37 @@ function Dict() {
         rowKey="id"
         loading={isLoading}
         expandable={{
-          onExpand: handleExpand,
+          expandIcon: ({ expanded, onExpand, record }) => {
+            
+            // 无子节点
+            if (!record.hasChildren) {
+              return <span style={{display: 'inline-block', width: 24}}></span>
+            }
+
+            // 展开状态
+            if (expanded) {
+              return <MinusCircleTwoTone style={{marginRight: 24}} onClick={(e) => onExpand(record, e)} />
+            }
+
+            return (
+              <PlusCircleTwoTone style={{marginRight: 24}} onClick={async (e) => {
+                // 标识有孩子, 但还没有, 请求获取子列表
+                if (record.hasChildren && record?.children?.length === 0) {
+                  const { data: { data } } = await getDictList(record.id)
+                  // 如果字典项的hasChildren为true, 给它添加一个children属性, 值为[]
+                  data.forEach(item => {
+                    if (item.hasChildren) {
+                      item.children = []
+                    }
+                  })
+                  // 添加为当前字典项的孩子
+                  record.children = data
+                }
+                // 切换图标
+                onExpand(record, e)
+              }} />
+            )
+          }
         }}
       />
     </BasicContent>
