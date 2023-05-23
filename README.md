@@ -4,10 +4,9 @@
 
 ## 🚀 项目截图
 
-<!-- ![image](https://user-images.githubusercontent.com/26358837/235359226-f6118a26-64d8-4ccd-95c4-f5876b27db68.png) -->
-![image](https://cdn.nlark.com/yuque/0/2023/png/338969/1684553370130-41012dd7-886a-4edf-8c1c-1f8ae4b700eb.png)
+![image](./public/login.png)
 
-![image](https://cdn.nlark.com/yuque/0/2023/png/338969/1684823827086-82194c10-e91e-4d71-a221-34ccee9a72ab.png)
+![image](./public/home.png)
 ## 💻 安装使用
 
 - 获取项目代码
