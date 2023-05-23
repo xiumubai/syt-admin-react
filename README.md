@@ -2,24 +2,24 @@
 
 使用`React18`,`Typescript`,`Vite`,`Antd5.0`等主流技术开发的开箱即用的中后台前端项目，`Vite`实现自动生成路由，支持`KeepAlive`功能，`react-redux`状态管理，支持虚拟滚动表格，`UnoCss`开发样式。
 
-## 🚀 项目演示
-[演示地址](https://southliu.github.io/)<br>
-[国内访问](https://southliu.gitee.io)
+## 🚀 项目截图
 
-![image](https://user-images.githubusercontent.com/26358837/235359226-f6118a26-64d8-4ccd-95c4-f5876b27db68.png)
+<!-- ![image](https://user-images.githubusercontent.com/26358837/235359226-f6118a26-64d8-4ccd-95c4-f5876b27db68.png) -->
+![image](https://cdn.nlark.com/yuque/0/2023/png/338969/1684553370130-41012dd7-886a-4edf-8c1c-1f8ae4b700eb.png)
 
+![image](https://cdn.nlark.com/yuque/0/2023/png/338969/1684823827086-82194c10-e91e-4d71-a221-34ccee9a72ab.png)
 ## 💻 安装使用
 
 - 获取项目代码
 
 ```bash
-git clone https://github.com/southliu/react-admin.git
+git clone https://gitee.com/guigu-fe/syt-react-admin
 ```
 
 - 选择目录
 
 ```bash
-cd react-admin
+cd syt-react-admin
 ```
 
 - 安装全局依赖依赖，存在则不用安装
@@ -57,9 +57,6 @@ pnpm build
 - [x] 可视化数据大屏
 - [x] 打包分包
 - [x] 手机端适配
-- [ ] Web Worker
-- [ ] Web Assembly
-- [ ] 测试用例
 
 ## 🧩 图标(iconify)
 
@@ -67,7 +64,7 @@ pnpm build
 - VS Code安装Iconify IntelliSense - 图标内联显示和自动补全
 
 ## 🎗️ Git 提交示例
-### Git提交不规范会导致无法提交，`feat`关键字可以按照下面`Git 贡献提交规范`来替换。
+**Git提交不规范会导致无法提交，`feat`关键字可以按照下面`Git 贡献提交规范`来替换。**
 ```
 git add .
 git commit -m "feat: 新增功能"
